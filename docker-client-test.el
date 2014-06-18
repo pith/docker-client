@@ -5,6 +5,8 @@
 ;;
 ;; Then eval these lines one by one.
 
+(require 'docker-client)
+
 (dkr/docker-containers)
 
 (dkr/docker-inspect container-name)

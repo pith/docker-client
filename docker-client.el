@@ -53,3 +53,6 @@
       (url-retrieve-synchronously (format "http://%s:%s/containers/%s/%s" docker-host docker-port containerID url))
     (goto-char url-http-end-of-headers)
     (json-read)))
+
+(provide 'docker-client)
+;; docker-client.el ends here

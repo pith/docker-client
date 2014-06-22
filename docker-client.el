@@ -34,6 +34,9 @@
 ;; (defvar docker-host "myhost.com")
 ;; (defvar docker-port "8080")
 
+;;; Dependencies
+
+;; request.el is required (https://github.com/tkf/emacs-request)
 
 (require 'url)
 (require 'json)

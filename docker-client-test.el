@@ -7,6 +7,7 @@
 
 (require 'docker-client)
 
+;; Gets
 (dkr/docker-containers)
 
 (dkr/docker-inspect container-name)
@@ -16,3 +17,12 @@
 (dkr/docker-logs container-name)
 
 (dkr/docker-changes container-name)
+
+;; Posts
+(dkr/start-container container-name)
+
+(dkr/stop-container container-name) ;message: "Stop container: success"
+
+(dkr/stop-container container-name "10") ;message: "Stop container: success"
+
+(dkr/stop-container "zzz") ;message: "Container not found"

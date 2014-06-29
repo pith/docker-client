@@ -98,8 +98,8 @@ Optional parameters:
 (defun dkr/delete-container (contrainerID &optional name)
   "Create a container.
 
-Optional parameters:
 Argument CONTRAINERID container name.
+Optional parameters:
 -   **NAME** – Assign the specified name to the container.  Must
     match `/?[a-zA-Z0-9_-]+`."
   (request
@@ -121,29 +121,34 @@ Argument CONTRAINERID container name.
 ;; Docker inspect
 (defun dkr/docker-inspect (containerID)
   "Return low-level information on the container id.
+
 Argument CONTAINERID container name."
   (dkr/http-get containerID "json"))
 
 ;; Docker top
 (defun dkr/docker-top (containerID)
   "List processes running inside the container id.
+
 Argument CONTAINERID container name."
   (dkr/http-get containerID "top"))
 
 ;; Docker logs
 (defun dkr/docker-logs (containerID)
   "Get stdout and stderr logs from the container id.
+
 Argument CONTAINERID container name."
   (dkr/http-get containerID "logs"))
 
 ;; Docker changes
 (defun dkr/docker-changes (containerID)
   "Inspect change on container id's filesystem.
+
 Argument CONTAINERID container name."
   (dkr/http-get containerID "changes"))
 
 (defun dkr/http-get (containerID url)
   "Http GET request.
+
 Argument CONTAINERID container name.
 Argument URL url path."
   (with-current-buffer
@@ -153,6 +158,7 @@ Argument URL url path."
 
 (defun dkr/start-container (containerID)
   "Start a container.
+
 Argument CONTAINERID container name."
   (request
    (format "%s/containers/%s/start" docker-path containerID)
@@ -164,8 +170,6 @@ Argument CONTAINERID container name."
 (defun dkr/stop-container (containerID &optional timeout)
   "Stop a container.
 
-Optional parameter:
--   **t** – number of seconds to wait before killing the container.
 Argument CONTAINERID container name.
 Optional argument TIMEOUT number of seconds to wait before killing the container."
   (request
@@ -182,8 +186,6 @@ Optional argument TIMEOUT number of seconds to wait before killing the container
 (defun dkr/restart-container (containerID &optional timeout)
   "Restart a container.
 
-Optional parameters:
--   **t** – number of seconds to wait before killing the container.
 Argument CONTAINERID container name.
 Optional argument TIMEOUT number fo seconds to wait before killing the container."
   (request
@@ -254,6 +256,7 @@ false
 
 (defun dkr/wait-container (containerID)
   "Wait a container.
+
 Argument CONTAINERID container name."
   (request
    (format "%s/containers/%s/wait" docker-path containerID)
@@ -293,9 +296,6 @@ Optional parameters:
 ;;POST /containers/(id)/copy
 
 ;;; Images
-
-(provide 'docker-client)
-;; docker-client.el ends here
 
 (provide 'docker-client)
 

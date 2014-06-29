@@ -33,8 +33,8 @@
 
 ;;; Code:
 
-(defvar docker-host "pith.fr")
-(defvar docker-port "5555")
+;;(defvar docker-host "")
+;;(defvar docker-port "")
 
 ;;; Dependencies
 

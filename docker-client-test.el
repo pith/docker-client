@@ -47,3 +47,5 @@
 (dkr/stop-container container-name "10") ;message: "Stop container: success"
 
 (dkr/stop-container "zzz") ;message: "Container not found"
+
+(dkr/list-containers "1")

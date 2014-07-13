@@ -33,7 +33,7 @@
 
 ;;; Code:
 
-;;(defvar docker-host "")
+;(defvar docker-host "")
 ;;(defvar docker-port "")
 
 ;;; Dependencies
@@ -53,32 +53,57 @@
 ;;; Containers
 
 ;; Docker ps
-(defun dkr/docker-containers ()
+(defun dkr/docker-containers (all)
   "List docker containers."
   (with-current-buffer
-      (url-retrieve-synchronously (format "%s/containers/json?all=1" docker-path))
-    (goto-char url-http-end-of-headers)
-    (json-read)))
+      (url-retrieve-synchronously (format "%s/containers/json?all=%s" docker-path all))
+    (goto-char (+ 1 url-http-end-of-headers))
+    (json-read)
+    ))
 
+;; The following funcion may be better than the prior one
+;; as it is asynchronous, but that is for later.
+(defun dkr/list-all-containers (all)
+  "List all containers."
+  (setq containers nil)
+  (request
+   (format "%s/containers/json" docker-path)
+   :params `(("all" . ,all))
+   
+   :parser 'json-read
+   :success (cl-function
+             (lambda (&key data &allow-other-keys)
+               (message "%s" data)
+               (setq containers data)
+               ))
+   :status-code '((400 . (lambda (&rest _) (message "Bad parameter")))
+                  (500 . (lambda (&rest _) (message "Server error"))))
+   )
+  )
+
+;; dkr/list-containers don't work as expected. Would be fine with a
+;; litle help. Thanks. The above functions would be enought for me
+;; now but the following one should be more powerfull.
 (defun dkr/list-containers (&optional all limit since before size)
   "List containers.
 
 Optional parameters:
--   **ALL** – 1/True/true or 0/False/false, Show all containers.
+-   ALL – 1/True/true or 0/False/false, Show all containers.
     Only running containers are shown by default
--   **LIMIT** – Show `limit` last created
+-   LIMIT – Show `limit` last created
     containers, include non-running ones.
--   **SINCE** – Show only containers created since Id, include
+-   SINCE – Show only containers created since Id, include
     non-running ones.
--   **BEFORE** – Show only containers created before Id, include
+-   BEFORE – Show only containers created before Id, include
     non-running ones.
--   **SIZE** – 1/True/true or 0/False/false, Show the containers
+-   SIZE – 1/True/true or 0/False/false, Show the containers
     sizes"
   (request
    (format "%s/containers/json" docker-path)
-   :params (if (not (equal "1" nil))
-	     '(("all" . all))
-	   nil)
+   :params (list (cons "all" all)
+            (cons "limit" limit)
+            )
+   
    ;; :params '(("all" . all)
    ;; 	       ;; ("limit" . limit)
    ;; 	       ;; ("since" . since)
@@ -86,13 +111,14 @@ Optional parameters:
    ;; 	       ;; ("size" . size)
    ;; 	       )
    :parser 'json-read
-   :success (cl-function
-	     (lambda (&key data &allow-other-keys)
-	       (message "I sent: %S" data)))
+   :success (function*
+           (lambda (&key data &allow-other-keys)
+             (message "I sent: %S" (assoc-default 'files data))))
    :status-code '((400 . (lambda (&rest _) (message "Bad parameter")))
-		  (500 . (lambda (&rest _) (message "Server error"))))
-   )
-  )
+                  (500 . (lambda (&rest _) (message "Server error"))))
+   ))
+
+(dkr/list-containers "1")
 
 ;; Create container
 (defun dkr/delete-container (contrainerID &optional name)
@@ -100,7 +126,7 @@ Optional parameters:
 
 Argument CONTRAINERID container name.
 Optional parameters:
--   **NAME** – Assign the specified name to the container.  Must
+-  NAME Assign the specified name to the container.  Must
     match `/?[a-zA-Z0-9_-]+`."
   (request
    (format "%s/containers/%s" docker-path containerID)

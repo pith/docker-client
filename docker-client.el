@@ -48,18 +48,36 @@
 (require 'json)
 (require 'request)
 
+(defgroup docker nil
+  "Docker related Applications and libraries.")
+
+(defcustom docker-host-list
+  '()
+  "Docker host list.
+This list contains the Docker host list. Host are defined by a names
+and an URL. Example: 
+'(docker-host-list (quote ((\"hostname\" . \"http://localhost:4243\"))))"
+  :type '(alist :key-type (string :tag "Host name")
+                :value-type (string :tag "Host URL"))
+  :group 'docker)
+
 (defvar docker-path (format "http://%s:%s" docker-host docker-port))
 
 ;;; Containers
 
 ;; Docker ps
+; TODO for now only the first host is taken into account. Concatenate all the list.
 (defun dkr/docker-containers (all)
   "List docker containers."
-  (with-current-buffer
-      (url-retrieve-synchronously (format "%s/containers/json?all=%s" docker-path all))
-    (goto-char (+ 1 url-http-end-of-headers))
-    (json-read)
-    ))
+  (car (mapcar 
+    (lambda (container) 
+      (with-current-buffer
+          (url-retrieve-synchronously 
+           (format "%s/containers/json?all=%s" (cdr container) all))
+        (goto-char (+ 1 url-http-end-of-headers))
+        (json-read)
+        ))
+    docker-host-list)))
 
 ;; The following funcion may be better than the prior one
 ;; as it is asynchronous, but that is for later.
